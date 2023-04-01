@@ -204,3 +204,8 @@ function Duelist:displayHand()
     end
 end
  
+ 
+ net.Receive("duel_start", function()
+    local duel_data = net.ReadTable()
+    -- Do something with the received data
+end)
