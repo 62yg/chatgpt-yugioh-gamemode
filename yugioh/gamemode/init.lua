@@ -1,6 +1,10 @@
+AddCSLuaFile( "shared.lua" )
+include("shared.lua")
+include("duelist.lua")
 -- Settings
 STARTING_LP = 8000
 STARTING_HAND_SIZE = 5
+AddCSLuaFile( "shared.lua" )
 
 -- Card list
 CARD_LIST = {
@@ -11,12 +15,21 @@ CARD_LIST = {
 }
 
 -- Initialize the game
-function game_start()
-    initialize_decks()
-    draw_starting_hands()
+function duel_start(ply, command, args)
+    if #player.GetAll() == 2 then
+        for _, p in ipairs(player.GetAll()) do
+            p.deck = {}
+            p.hand = {}
+            p.field = { monsterZones = {}, spellTrapZones = {} }
+            p.lifePoints = STARTING_LP
+        end
+
+        initialize_decks()
+
+        -- etc.
+    end
 end
 
--- Initialize the players' decks
 function initialize_decks()
     for _, p in ipairs(player.GetAll()) do
         local deck = {}
@@ -24,9 +37,12 @@ function initialize_decks()
             table.insert(deck, CARD_LIST[i])
         end
         table.Shuffle(deck)
-        p:SetNWTable("deck", deck)
+        p:SetNWVar("deck", deck)
     end
 end
+
+
+
 
 -- Draw starting hands for both players
 function draw_starting_hands()
@@ -40,13 +56,14 @@ function draw_starting_hands()
 end
 
 -- Start the duel
+-- Start the duel
 function duel_start(ply, command, args)
     if #player.GetAll() == 2 then
         for _, p in ipairs(player.GetAll()) do
-            p:SetNWTable("deck", {})
-            p:SetNWTable("hand", {})
-            p:SetNWTable("field", { monsterZones = {}, spellTrapZones = {} })
-            p:SetNWInt("lifePoints", STARTING_LP)
+            p:SetNWVarProxy("deck", {})
+            p:SetNWVarProxy("hand", {})
+            p:SetNWVarProxy("field", { monsterZones = {}, spellTrapZones = {} })
+            p:SetNWVarProxy("lifePoints", STARTING_LP)
         end
 
         game_start()
@@ -54,6 +71,9 @@ function duel_start(ply, command, args)
         ply:ChatPrint("There must be exactly two players in the game to start a duel.")
     end
 end
+
+
+
 
 -- Register the chat command
 concommand.Add("duel_start", duel_start)
@@ -72,3 +92,12 @@ end
 
 -- Load the card images on startup
 load_card_images()
+local Duelist = {}
+
+function Duelist:shuffleDeck()
+    math.randomseed(os.time())
+    for i = #self.deck, 2, -1 do
+        local j = math.random(i)
+        self.deck[i], self.deck[j] = self.deck[j], self.deck[i]
+    end
+end

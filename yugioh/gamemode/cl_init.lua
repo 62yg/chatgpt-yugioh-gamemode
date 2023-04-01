@@ -15,7 +15,7 @@ end
 -- Yugioh gamemode client code
 
 -- Include shared code
-include("shared.lua")
+
 
 -- Define function to create card panel
 function createCardPanel(card)
@@ -195,3 +195,12 @@ function drawHand(ply)
         surface.DrawTexturedRect(startX + (i - 1) * (CARD_WIDTH + CARD_SPACING), y, CARD_WIDTH, CARD_HEIGHT)
     end
 end
+
+local Duelist = {}
+
+function Duelist:displayHand()
+    for i, card in ipairs(self.hand) do
+        print("Card " .. i .. ": " .. card.name)
+    end
+end
+ 

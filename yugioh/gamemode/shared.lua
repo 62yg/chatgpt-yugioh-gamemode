@@ -105,3 +105,14 @@ function Yugioh.startDuel()
         print("Cannot start duel: need exactly 2 active players")
     end
 end
+
+local Duelist = {}
+
+function Duelist:drawCard()
+    if #self.deck == 0 then
+        return
+    end
+
+    local card = table.remove(self.deck, 1)
+    table.insert(self.hand, card)
+end
