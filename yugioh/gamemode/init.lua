@@ -55,22 +55,27 @@ function draw_starting_hands()
     end
 end
 
--- Start the duel
--- Start the duel
 function duel_start(ply, command, args)
-    if #player.GetAll() == 2 then
-        for _, p in ipairs(player.GetAll()) do
+    local players = player.GetAll()
+
+    if #players == 2 then
+        for _, p in ipairs(players) do
             p:SetNWVarProxy("deck", {})
             p:SetNWVarProxy("hand", {})
             p:SetNWVarProxy("field", { monsterZones = {}, spellTrapZones = {} })
             p:SetNWVarProxy("lifePoints", STARTING_LP)
         end
-
-        game_start()
+util.AddNetworkString("StartDuel")
+        net.Start("StartDuel")
+        net.WriteTable(players)
+        net.Broadcast()
     else
         ply:ChatPrint("There must be exactly two players in the game to start a duel.")
     end
 end
+
+
+
 
 
 
