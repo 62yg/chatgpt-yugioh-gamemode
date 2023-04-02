@@ -27,6 +27,51 @@ function UpdateDuelTable(ply, key, value)
     net.Broadcast()
 end
 
+function GM:DuelStart(ply, command, args)
+    if IsValid(ply) and ply:IsPlayer() and ply:IsAdmin() then
+        if not ply:HasOpponent() then
+            ply:SetOpponent(nil)
+
+            local players = player.GetAll()
+            local availablePlayers = {}
+
+            for i = 1, #players do
+                local v = players[i]
+
+                if v ~= ply and not v:HasOpponent() and not v:IsDueling() then
+                    table.insert(availablePlayers, v)
+                end
+            end
+
+            if #availablePlayers > 0 then
+                local opponent = availablePlayers[math.random(#availablePlayers)]
+
+                ply:SetOpponent(opponent)
+                opponent:SetOpponent(ply)
+
+                ply:SetDueling(true)
+                opponent:SetDueling(true)
+
+                ply:SetPos(Vector(0, 0, 0))
+                opponent:SetPos(Vector(0, 0, 0))
+
+                ply:Freeze(true)
+                opponent:Freeze(true)
+
+                ply:ChatPrint("You have been matched with " .. opponent:Nick() .. ". Get ready to duel!")
+                opponent:ChatPrint("You have been matched with " .. ply:Nick() .. ". Get ready to duel!")
+            else
+                ply:ChatPrint("There are no available players to duel with.")
+            end
+        else
+            ply:ChatPrint("You are already in a duel.")
+        end
+    end
+end
+concommand.Add("duel_start", GM.DuelStart)
+
+
+
 -- Initialize the game
 function duel_start(ply, command, args)
     if #player.GetAll() == 2 then
@@ -143,3 +188,13 @@ PLAYER_META.__index = function(self, key)
         return old_index(self, key)
     end
 end
+
+
+
+
+function GM:ShowSpare2(ply)
+    if IsValid(ply:GetOpponent()) then
+        ply:ChatPrint("Your opponent's name is " .. ply:GetOpponent():Nick())
+    end
+end
+
