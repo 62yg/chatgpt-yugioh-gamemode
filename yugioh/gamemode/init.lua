@@ -121,3 +121,25 @@ function Duelist:shuffleDeck()
         self.deck[i], self.deck[j] = self.deck[j], self.deck[i]
     end
 end
+
+local PLAYER_META = FindMetaTable("Player")
+
+if not PLAYER_META then
+    error("[ERROR] Could not find player meta table.")
+end
+
+-- Remove circular references
+local old_index = PLAYER_META.__index
+PLAYER_META.__index = function(self, key)
+    if key == "GetActiveWeapon" then
+        return nil
+    elseif key == "GetViewModel" then
+        return nil
+    elseif key == "GetHands" then
+        return nil
+    elseif key == "GetVehicle" then
+        return nil
+    else
+        return old_index(self, key)
+    end
+end
