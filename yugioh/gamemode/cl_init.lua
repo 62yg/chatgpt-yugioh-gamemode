@@ -209,3 +209,17 @@ end
     local duel_data = net.ReadTable()
     -- Do something with the received data
 end)
+
+
+-- When sending the table:
+local tableStr = util.TableToJSON(myTable)
+net.Start("MyNetMessage")
+net.WriteString(tableStr)
+net.Send(ply)
+
+-- When receiving the table:
+net.Receive("MyNetMessage", function()
+    local tableStr = net.ReadString()
+    local myTable = util.JSONToTable(tableStr)
+    -- Do something with myTable
+end)

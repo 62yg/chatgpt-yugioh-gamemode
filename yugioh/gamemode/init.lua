@@ -14,6 +14,19 @@ CARD_LIST = {
     -- Add more cards here
 }
 
+util.AddNetworkString("UpdateDuelTable")
+
+function UpdateDuelTable(ply, key, value)
+    if !IsValid(ply.Duel) then return end
+    
+    local tbl = ply.Duel
+    tbl[key] = value
+    
+    net.Start("UpdateDuelTable")
+        net.WriteTable(tbl)
+    net.Broadcast()
+end
+
 -- Initialize the game
 function duel_start(ply, command, args)
     if #player.GetAll() == 2 then
