@@ -1,4 +1,5 @@
 -- Yugioh gamemode shared code
+AddCSLuaFile( "shared.lua" )
 
 -- Define card object
 Card = {}
@@ -115,21 +116,4 @@ function Duelist:drawCard()
 
     local card = table.remove(self.deck, 1)
     table.insert(self.hand, card)
-end
-
-local plymeta = FindMetaTable("Player")
-if not plymeta then return end
-
-local old_index = plymeta.__index
-
-function plymeta:__index(key)
-    if key == "CurrentCommand" then
-        return nil
-    elseif key == "SteamID64" then
-        return util.SteamIDTo64(self:SteamID())
-    elseif key == "IsPlayer" then
-        return true
-    end
-
-    return old_index(self, key)
 end

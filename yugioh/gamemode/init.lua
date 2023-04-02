@@ -5,6 +5,7 @@ include("duelist.lua")
 STARTING_LP = 8000
 STARTING_HAND_SIZE = 5
 AddCSLuaFile( "shared.lua" )
+include( "player_extension.lua" )
 
 -- Card list
 CARD_LIST = {
