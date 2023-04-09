@@ -44,10 +44,13 @@ end
 -- init.lua
 
 hook.Add("PlayerInitialSpawn", "InitializePlayer", function(ply)
+    InitializeDuelData(ply) -- Move this line before LoadPlayerDeck
     LoadPlayerDeck(ply)
-    InitializeDuelData(ply)
     -- (other player initialization code here)
 end)
+
+
+
 
 hook.Add("PlayerDisconnected", "SaveDeckOnDisconnect", function(ply)
     SavePlayerDeck(ply)
@@ -125,6 +128,12 @@ end
 function DrawCard(ply)
     local duelData = GetDuelData(ply)
     if not duelData then
+        print("DrawCard: DuelData is nil")
+        return
+    end
+
+    if not duelData.Deck then
+        print("DrawCard: Deck is nil")
         return
     end
 
@@ -137,6 +146,7 @@ function DrawCard(ply)
         return nil
     end
 end
+
 
 
 function MoveCardToGraveyard(ply, card)
@@ -257,22 +267,21 @@ function LoadPlayerDeck(ply)
     local steamID = ply:SteamID64()
     local filePath = "yugioh_gamemode/decks/" .. steamID .. ".txt"
 
-    if ply:GetNW2Var("DuelData") == nil then
-        ply:SetNW2Var("DuelData", { Deck = {} })
-    end
-
-    local duelData = GetDuelData(ply)
-
     if file.Exists(filePath, "DATA") then
         local deckData = file.Read(filePath, "DATA")
         local deckTable = util.JSONToTable(deckData)
+        local duelData = GetDuelData(ply)
         duelData.Deck = deckTable
+        SetDuelData(ply, duelData)
     else
         local basicDeck = CreateBasicDeck(40) -- Creates a deck of 40 random cards
+        local duelData = GetDuelData(ply)
         duelData.Deck = basicDeck
+        SetDuelData(ply, duelData)
     end
 
-    SetDuelData(ply, duelData)
+    print("LoadPlayerDeck: Player", ply:Nick())
+    PrintTable(GetDuelData(ply))
 end
 
 

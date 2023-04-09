@@ -248,8 +248,14 @@ end
 -- cl_init.lua
 
 function ClearZone(zone)
-    for _, child in ipairs(zone:GetChildren()) do
-        child:Remove()
+    if zone ~= nil then
+       for _, child in ipairs(zone:GetChildren()) do
+         child:Remove()
+       end
+    else
+        print("Error: Zone is nil")
+        print("Function arguments:")
+        print(zone)
     end
 end
 
@@ -486,14 +492,33 @@ function CreateHandZone(player, parentPanel, mainPanel, x, y, cardWidth, cardHei
     handZone:SetSize(mainPanel:GetWide(), cardHeight)
     handZone:SetPos(x, y)
     handZone.Paint = function(self, w, h)
-        local cards = player:GetNWVar("Cards").Hand
-        if cards then
-            for i, card in ipairs(cards) do
-                surface.SetDrawColor(255, 255, 255, 255)
-                surface.SetMaterial(GetCardImageMaterial(card.imagePath))
-                surface.DrawTexturedRect((i - 1) * cardWidth, 0, cardWidth, cardHeight)
+        if player and player.GetNWVar then
+            local cards = player:GetNWString("Cards").Hand
+            if cards then
+                for i, card in ipairs(cards) do
+                    surface.SetDrawColor(255, 255, 255, 255)
+                    surface.SetMaterial(GetCardImageMaterial(card.imagePath))
+                    surface.DrawTexturedRect((i - 1) * cardWidth, 0, cardWidth, cardHeight)
+                end
             end
+        else
+            print("Error: player object or GetNetworkedWVar function is not available")
         end
     end
     return handZone
 end
+
+
+-- cl_init.lua
+
+local function UpdatePlayingFieldForAllPlayers()
+    for _, ply in ipairs(player.GetAll()) do
+        local handZone = GetHandZoneForPlayer(ply)
+        local fieldZone = GetFieldZoneForPlayer(ply)
+        local graveyardZone = GetGraveyardZoneForPlayer(ply)
+
+        UpdatePlayingField(ply, handZone, fieldZone, graveyardZone)
+    end
+end
+
+timer.Create("UpdatePlayingFieldTimer", 1, 0, UpdatePlayingFieldForAllPlayers)
